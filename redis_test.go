@@ -12,12 +12,12 @@ func TestRedis(t *testing.T) {
 }
 
 func example1() {
-	client := DefaultClient()
-	defer client.Close()
+	DefaultClient()
+	defer Close()
 
 	//fmt.Println(client.Set("name", "Raed Shomali")) // true <nil>
 	//fmt.Println(client.SetNx("name", "Hello"))      // false <nil>
-	fmt.Println(client.SetEx("name", "Raed Shomali", 100)) // true <nil>
+	fmt.Println(RedisClient.SetEx("name", "Raed Shomali", 100)) // true <nil>
 	//fmt.Println(client.Expire("name", 1))           // true <nil>
 	//fmt.Println(client.Expire("unknown", 1))        // false <nil>
 	//fmt.Println(client.Keys("*"))                   // [id name] <nil>
@@ -44,10 +44,10 @@ func example2() {
 		Port: 6379,
 	}
 
-	client := SetupClient(options)
-	defer client.Close()
+	RedisSignalClient(options)
+	defer Close()
 
-	fmt.Println(client.Ping()) // PONG <nil>
+	fmt.Println(RedisClient.Ping()) // PONG <nil>
 }
 
 func example3() {
@@ -56,10 +56,10 @@ func example3() {
 		MasterName: "master",
 	}
 
-	client := SetupSentinelClient(options)
-	defer client.Close()
+	RedisSentinelClient(options)
+	defer Close()
 
-	fmt.Println(client.Ping()) // PONG <nil>
+	fmt.Println(RedisClient.Ping()) // PONG <nil>
 }
 
 func example4() {

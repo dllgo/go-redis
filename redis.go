@@ -39,28 +39,50 @@ const (
 	hIncrByFloatCommand = "HINCRBYFLOAT"
 )
 
+// RedisClient Redis缓存客户端单例
+var RedisClient *Client
+
 // DefaultClient returns a client with default options
-func DefaultClient() *Client {
+func DefaultClient() {
 	pool := newServerPool(&Options{})
-	return NewClient(pool)
+	client := NewClient(pool)
+	_, err := client.Ping()
+	if err != nil {
+		panic("连接Redis不成功")
+	}
+	RedisClient = client
 }
 
 // SetupClient returns a client with provided options
-func SetupClient(options *Options) *Client {
+func RedisSignalClient(options *Options) {
 	pool := newServerPool(options)
-	return NewClient(pool)
+	client := NewClient(pool)
+	_, err := client.Ping()
+	if err != nil {
+		panic("连接Redis不成功")
+	}
+	RedisClient = client
 }
 
 // SetupSentinelClient returns a client with provided options
-func SetupSentinelClient(options *SentinelOptions) *Client {
+func RedisSentinelClient(options *SentinelOptions) {
 	writePool := newWriteSentinelPool(options)
 	readPool := newReadSentinelPool(options)
-	return &Client{writePool: writePool, readPool: readPool}
+	client := &Client{writePool: writePool, readPool: readPool}
+	_, err := client.Ping()
+	if err != nil {
+		panic("连接Redis不成功")
+	}
+	RedisClient = client
 }
 
 // NewClient returns a client using provided redis.Pool
 func NewClient(pool *redis.Pool) *Client {
 	return &Client{writePool: pool, readPool: pool}
+}
+
+func Close() {
+	defer RedisClient.Close()
 }
 
 // Client redis client
